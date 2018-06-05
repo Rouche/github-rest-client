@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head :: head('Repository')}"></head>
+
+<body>
+    <div class="container-fluid" style="margin-top: 20px">
+        <div class="row">
+            <div class="col-lg-9 mx-auto">
+                <div class="card border-primary">
+                    <div class="card-header bg-primary text-white">
+                        <h1 class="card-title">
+                            <span>Github repositories for[</span>
+                            <span th:text="${user}"></span>
+                            <span>]</span>
+                        </h1>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <span>Count: </span><span th:text="${repositories.size()}"></span>
+                            </div>
+                        </div>
+                        <form  th:action="@{/clone}" method="post">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <button type="submit" class="btn btn-primary">Clone</button>
+                                </div>
+                            </div>
+                        </form>
+                        <form  th:action="@{/repositories/collaborators}" method="post">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <input type="text" name="login"></input>
+                                    <button type="submit" class="btn btn-primary">Add collaborator</button>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="table-responsive" th:if="${not #lists.isEmpty(repositories)}">
+                            <table class="table table-responsive table-hover w-100 d-block d-md-table">
+                                <thead class="thead-light">
+                                <tr>
+                                    <th>Select</th>
+                                    <th>Private</th>
+                                    <th>Owner</th>
+                                    <th>Clone URL</th>
+                                    <th>Action</th>
+                                </tr>
+                                </thead>
+                                <tr th:each="repo,iter : ${repositories}">
+                                    <td><input th:name="${'repo' + iter.index}" type="checkbox" checked></td>
+                                    <td th:text="${repo.owner.login}"></td>
+                                    <td th:text="${repo.private ? 'PRIVATE' : ''}"></td>
+                                    <td th:text="${repo.cloneUrl}">Url</td>
+                                    <td><a class="fa fa-users" th:href="${'/repositories/' + repo.owner.login + '/' + repo.name + '/collaborators'}"></a></td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <button type="submit" class="btn btn-primary">Clone</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

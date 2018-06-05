@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org">
+    <head th:fragment="head (title)">
+        <title th:text="${title}">Title replace me</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <meta name="description" content=""/>
+        <meta name="keywords" content=""/>
+        <meta name="robots" content="index,nofollow"/>
+        <meta charset="UTF-8"/>
+
+        <title>Show Recipe</title>
+
+        <link rel="stylesheet" th:href="@{/css/custom.css}">
+
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+              crossorigin="anonymous"
+              th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+              crossorigin="anonymous">
+
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+                crossorigin="anonymous" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+                th:src="@{/webjars/jquery/jquery.min.js}"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.1/umd/popper.js"
+                crossorigin="anonymous" integrity="sha256-1bI2hYpoXO8605goiOg+TiWksCVw2RBxWRtnvzPRWN0="
+                th:src="@{/webjars/popper.js/1.14.1/umd/popper.js}"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+                crossorigin="anonymous" integrity=""
+                th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>    </head>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head :: head('Repository')}"></head>
+
+<body>
+    <div class="container-fluid" style="margin-top: 20px">
+        <div class="row">
+            <div class="col-lg-9 mx-auto">
+                <div class="card border-primary">
+                    <div class="card-header bg-primary text-white">
+                        <h1 class="card-title">
+                            <span>Github invitations for [</span>
+                            <span th:text="${user}"></span>
+                            <span>]</span>
+                        </h1>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <span>Count: </span><span th:text="${invitations.size()}"></span>
+                            </div>
+                        </div>
+                        <div class="table-responsive" th:if="${not #lists.isEmpty(invitations)}">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <form  th:action="@{/invitations/acceptall}" method="get">
+                                        <button type="submit" class="btn btn-primary">Accept all</button>
+                                    </form>
+                                </div>
+                            </div>
+                            <table class="table table-responsive table-hover w-100 d-block d-md-table">
+                                <thead class="thead-light">
+                                <tr>
+                                    <th>Name</th>
+                                </tr>
+                                </thead>
+                                <tr th:each="invitation,iter : ${invitations}">
+                                    <td th:text="${invitation.repository.name}"></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
