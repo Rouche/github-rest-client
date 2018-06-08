@@ -2,3 +2,11 @@
 # GitHub Rest Client utilities
 
 This repository is for some utilities cleaning up big repos
+
+Documentation links:
+
+- Membership
+    https://developer.github.com/v3/orgs/members/#list-your-organization-memberships
+    
+- Accept membership
+    https://developer.github.com/changes/2014-08-28-accepting-organization-invitations-from-the-api/
