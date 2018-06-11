@@ -5,4 +5,5 @@ import org.eclipse.jgit.lib.ProgressMonitor;
 
 public interface GitApiService {
     void clone(Repository repository, ProgressMonitor monitor);
+    boolean exists(Repository repository);
 }

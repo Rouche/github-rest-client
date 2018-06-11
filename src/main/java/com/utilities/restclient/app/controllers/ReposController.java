@@ -2,6 +2,8 @@ package com.utilities.restclient.app.controllers;
 
 import com.utilities.restclient.app.api.v3.Invitation;
 import com.utilities.restclient.app.jgit.CloneProgress;
+import com.utilities.restclient.app.model.RepositoryForm;
+import com.utilities.restclient.app.model.RepositoryItem;
 import com.utilities.restclient.app.services.GitApiService;
 import com.utilities.restclient.app.services.GitHubClientAugment;
 import com.utilities.restclient.app.services.InvitationService;
@@ -12,15 +14,13 @@ import org.apache.commons.lang3.mutable.MutableInt;
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.GitHubClient;
-import org.eclipse.egit.github.core.client.GitHubResponse;
-import org.eclipse.egit.github.core.client.PagedRequest;
 import org.eclipse.egit.github.core.service.CollaboratorService;
 import org.eclipse.egit.github.core.service.RepositoryService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
@@ -74,7 +74,18 @@ public class ReposController {
 
         RepositoryService service = new RepositoryService(client);
         try {
-            model.addAttribute("repositories", service.getRepositories());
+            List<Repository> repositories = service.getRepositories();
+            RepositoryForm repositoryForm = RepositoryForm.builder().build();
+            repositories.forEach( repository -> {
+                repositoryForm.getRepositoryItems().add(
+                        RepositoryItem.builder()
+                                .repository(repository)
+                                .url(repository.getUrl())
+                                .selected(gitApiService.exists(repository))
+                                .build());
+            });
+
+            model.addAttribute("repositoryForm", repositoryForm);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -218,16 +229,19 @@ public class ReposController {
      * Clone a repository.
      * Uses jGit directly.
      * @param response http response
+     * @param repositoryForm form
      * @param model model
      */
     @PostMapping("/clone")
-    public void cloneRepositories(HttpServletResponse response, Model model) {
+    public void cloneRepositories(HttpServletResponse response,
+                                  @ModelAttribute("repositoryForm") RepositoryForm repositoryForm, Model model) {
 
         RepositoryService service = new RepositoryService(client);
         List<Repository> resultList = new ArrayList<>();
 
         try (Writer w = new PrintWriter(response.getOutputStream())) {
             List<Repository> repos = service.getRepositories();
+            List<RepositoryItem> items = repositoryForm.getRepositoryItems();
 
             writeHead(w);
             IOUtils.write(w, "<div>Receiving repos</div>");
@@ -235,14 +249,12 @@ public class ReposController {
 
                 Repository repository = repos.get(i.intValue());
 
+                int index = items.indexOf(RepositoryItem.builder().url(repository.getUrl()).build());
+                if(items.get(index).isSelected()) {
+                    IOUtils.write(w, "<div>Starting repository [" + repository.getUrl() + "]</div>");
 
-                IOUtils.write(w, "<div>Starting repository [" + repository.getName() + "]</div>");
-
-                gitApiService.clone(repository, new CloneProgress(w, i.intValue()));
-                resultList.add(repository);
-
-                if (i.intValue() > 3) {
-                    break;
+                    gitApiService.clone(repository, new CloneProgress(w, i.intValue()));
+                    resultList.add(repository);
                 }
             }
         } catch (Exception e) {

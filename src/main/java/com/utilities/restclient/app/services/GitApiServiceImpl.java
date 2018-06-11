@@ -46,4 +46,10 @@ public class GitApiServiceImpl implements GitApiService {
         }
 
     }
+
+    @Override
+    public boolean exists(Repository repository) {
+
+        return (new File(project_git_root + repository.getName())).exists();
+    }
 }
