@@ -8,6 +8,7 @@ import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.client.GitHubRequest;
 import org.eclipse.egit.github.core.client.GitHubResponse;
 
+import java.net.HttpURLConnection;
 import java.net.URI;
 
 /**
@@ -16,6 +17,13 @@ import java.net.URI;
 public class GitHubClientAugment extends GitHubClient {
 
     private String credentials;
+    private String userAgent = "GitHubJava/2.1.5";
+    private String accept = "application/vnd.github.beta+json";
+    private String acceptNightshade = null;
+
+    public void enableNightshade() {
+        this.acceptNightshade = "application/vnd.github.nightshade-preview+json";
+    }
 
     @Override
     public GitHubClient setOAuth2Token(String token) {
@@ -46,5 +54,17 @@ public class GitHubClientAugment extends GitHubClient {
         } catch(Exception e) {
             throw new RuntimeException("Error: ", e);
         }
+    }
+
+    @Override
+    protected HttpURLConnection configureRequest(HttpURLConnection request) {
+        if (this.credentials != null) {
+            request.setRequestProperty("Authorization", this.credentials);
+        }
+
+        request.setRequestProperty("User-Agent", this.userAgent);
+        request.setRequestProperty("Accept", acceptNightshade == null ? accept : acceptNightshade);
+        acceptNightshade = null;
+        return request;
     }
 }

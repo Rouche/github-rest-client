@@ -21,6 +21,7 @@
                                 <span>Count: </span><span th:text="${repositoryForm.repositoryItems.size()}"></span>
                             </div>
                         </div>
+                        <p>
                         <form th:action="@{/repositories/collaborators}" method="post">
                             <div class="row">
                                 <div class="col-md-4">
@@ -29,6 +30,17 @@
                                 </div>
                             </div>
                         </form>
+                        </p>
+                        <p>
+                        <form th:action="@{/repositories/transfer}" method="post">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <input type="text" name="login"></input>
+                                    <button type="submit" class="btn btn-primary">Transfer Repo</button>
+                                </div>
+                            </div>
+                        </form>
+                        </p>
                         <div class="table-responsive" th:if="${not #lists.isEmpty(repositoryForm.repositoryItems)}">
                             <form th:object="${repositoryForm}" th:action="@{/clone}" method="post">
                                 <div class="row">
@@ -52,8 +64,8 @@
                                             <input th:field="*{repositoryItems[__${iter.index}__].selected}" type="checkbox"
                                                    th:disabled="*{repositoryItems[__${iter.index}__].selected}">
                                         </td>
-                                        <td th:text="${repo.repository.owner.login}"></td>
                                         <td th:text="${repo.repository.private ? 'PRIVATE' : ''}"></td>
+                                        <td th:text="${repo.repository.owner.login}"></td>
                                         <td th:text="${repo.repository.cloneUrl}">Url</td>
                                         <td><a class="fa fa-users" th:href="${'/repositories/' + repo.repository.owner.login + '/' + repo.repository.name + '/collaborators'}"></a></td>
                                     </tr>

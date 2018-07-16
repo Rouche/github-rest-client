@@ -4,10 +4,8 @@ import com.utilities.restclient.app.api.v3.Invitation;
 import com.utilities.restclient.app.jgit.CloneProgress;
 import com.utilities.restclient.app.model.RepositoryForm;
 import com.utilities.restclient.app.model.RepositoryItem;
-import com.utilities.restclient.app.services.GitApiService;
-import com.utilities.restclient.app.services.GitHubClientAugment;
-import com.utilities.restclient.app.services.InvitationService;
-import com.utilities.restclient.app.services.InvitationServiceImpl;
+import com.utilities.restclient.app.model.UserPayload;
+import com.utilities.restclient.app.services.*;
 import com.utilities.restclient.app.utils.IOUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.mutable.MutableInt;
@@ -39,12 +37,12 @@ public class ReposController {
     private final String api_token;
     private final String api_user;
 
-    private final GitHubClient client;
+    private final GitHubClientAugment client;
 
-    public ReposController(GitApiService gitApiService, @Value("${api.token}") String api_token,
-                           @Value("${api.user}") String api_user) {
+    public ReposController(GitApiService gitApiService, @Value("${master.api.token}") String api_token,
+                           @Value("${master.api.user}") String api_user) {
 
-        client = new GitHubClient();
+        client = new GitHubClientAugment();
         client.setOAuth2Token(api_token);
 
         this.gitApiService = gitApiService;
@@ -65,7 +63,7 @@ public class ReposController {
     }
 
     /**
-     * List repositories
+     * List repositories owned by {@link GitHubClient} see master.api.user
      * @param model model
      * @return view
      */
@@ -95,13 +93,13 @@ public class ReposController {
     }
 
     /**
-     * Add a collaborator to every repositories
+     * Add a collaborator to every selected repositories
      * @param newLogin Payload body
      * @param model model
      * @return view
      */
     @PostMapping("/repositories/collaborators")
-    public String addCollaborator(CollaboratorPayload newLogin, Model model) {
+    public String addCollaborator(UserPayload newLogin, Model model) {
 
         RepositoryService service = new RepositoryService(client);
         CollaboratorService collaboratorService = new CollaboratorService(client);
@@ -115,6 +113,39 @@ public class ReposController {
                     if(users.stream().noneMatch(user -> user.getLogin().equals(login))) {
                         collaboratorService.addCollaborator(repository, login);
                     }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        model.addAttribute("repositories", repositories);
+
+        return "github/repositories";
+    }
+
+    /**
+     * Transfer a repository to a new Owner
+     * @param newLogin Payload body
+     * @param model model
+     * @return view
+     */
+    @PostMapping("/repositories/transfer")
+    public String transfer(UserPayload newLogin, Model model) {
+
+        RepositoryService service = new RepositoryService(client);
+        TransferService transferService = new TransferServiceImpl(client);
+
+        List<Repository> repositories = null;
+        try {
+            repositories = service.getRepositories();
+            repositories.forEach(repository -> {
+                try {
+                    if(repository.getOwner().getLogin().equals(newLogin.getLogin())) {
+                        return;
+                    }
+                    transferService.transfer(repository, newLogin.getLogin());
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -161,8 +192,8 @@ public class ReposController {
      */
     @PostMapping("/repositories/{owner}/{name}/collaborators")
     public String addCollaborator(@PathVariable("owner") String owner,
-                                @PathVariable("name") String name,
-                                CollaboratorPayload newLogin, Model model) {
+                                  @PathVariable("name") String name,
+                                  UserPayload newLogin, Model model) {
 
         CollaboratorService collaboratorService = new CollaboratorService(client);
         try {
@@ -179,7 +210,7 @@ public class ReposController {
     }
 
     @GetMapping("/invitations")
-    public String getInvitations(@Value("${api.token.rouche}") String token, Model model) {
+    public String getInvitations(@Value("${rouche.api.token}") String token, Model model) {
 
         GitHubClientAugment roucheClient = new GitHubClientAugment();
         roucheClient.setOAuth2Token(token);
@@ -200,7 +231,7 @@ public class ReposController {
     }
 
     @GetMapping("/invitations/acceptall")
-    public String acceptAllInvitations(@Value("${api.token.rouche}") String token) {
+    public String acceptAllInvitations(@Value("${rouche.api.token}") String token) {
 
         GitHubClientAugment roucheClient = new GitHubClientAugment();
         roucheClient.setOAuth2Token(token);

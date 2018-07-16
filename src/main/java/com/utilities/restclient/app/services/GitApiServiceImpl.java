@@ -20,7 +20,7 @@ public class GitApiServiceImpl implements GitApiService {
     private final String api_token;
     private final String project_git_root;
 
-    public GitApiServiceImpl(@Value("${api.token}") String api_token,
+    public GitApiServiceImpl(@Value("${master.api.token}") String api_token,
                              @Value("${project.git.root}") String project_git_root) {
 
         this.api_token = api_token;
