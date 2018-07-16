@@ -122,7 +122,7 @@ public class ReposController {
         }
         model.addAttribute("repositories", repositories);
 
-        return "github/repositories";
+        return "redirect:/repositories";
     }
 
     /**
@@ -155,7 +155,7 @@ public class ReposController {
         }
         model.addAttribute("repositories", repositories);
 
-        return "github/repositories";
+        return "redirect:/repositories";
     }
 
     /**
