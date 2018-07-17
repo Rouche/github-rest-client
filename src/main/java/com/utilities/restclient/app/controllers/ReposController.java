@@ -210,7 +210,7 @@ public class ReposController {
     }
 
     @GetMapping("/invitations")
-    public String getInvitations(@Value("${rouche.api.token}") String token, Model model) {
+    public String getInvitations(@Value("${target-user.api.token}") String token, Model model) {
 
         GitHubClientAugment roucheClient = new GitHubClientAugment();
         roucheClient.setOAuth2Token(token);
@@ -219,8 +219,13 @@ public class ReposController {
             InvitationService service = new InvitationServiceImpl(roucheClient);
             List<Invitation> invitations = service.getInvitations();
 
+            String targetUser = "No invitations found on target-user";
+            if(invitations.size() > 0) {
+                targetUser = invitations.get(0).getInvitee().getLogin();
+            }
+
             model.addAttribute("invitations", invitations);
-            model.addAttribute("user", "rouche");
+            model.addAttribute("user", targetUser);
 
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -231,7 +236,7 @@ public class ReposController {
     }
 
     @GetMapping("/invitations/acceptall")
-    public String acceptAllInvitations(@Value("${rouche.api.token}") String token) {
+    public String acceptAllInvitations(@Value("${target-user.api.token}") String token) {
 
         GitHubClientAugment roucheClient = new GitHubClientAugment();
         roucheClient.setOAuth2Token(token);
