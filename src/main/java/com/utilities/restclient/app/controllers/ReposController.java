@@ -14,6 +14,7 @@ import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.CollaboratorService;
 import org.eclipse.egit.github.core.service.RepositoryService;
+import org.eclipse.egit.github.core.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -101,20 +102,25 @@ public class ReposController {
     @PostMapping("/repositories/collaborators")
     public String addCollaborator(UserPayload newLogin, Model model) {
 
-        RepositoryService service = new RepositoryService(client);
-        CollaboratorService collaboratorService = new CollaboratorService(client);
+        UserService userService = new UserService(client);
         List<Repository> repositories = null;
         try {
+            String currentLogin = userService.getUser().getLogin();
+            RepositoryService service = new RepositoryService(client);
+            CollaboratorService collaboratorService = new CollaboratorService(client);
             repositories = service.getRepositories();
             repositories.forEach(repository -> {
+                if(!repository.getOwner().getLogin().equals(currentLogin)) {
+                    return;
+                }
                 try {
                     List<User> users = collaboratorService.getCollaborators(repository);
                     String login = newLogin.getLogin();
                     if(users.stream().noneMatch(user -> user.getLogin().equals(login))) {
                         collaboratorService.addCollaborator(repository, login);
                     }
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
+                } catch (Exception e) {
+                    log.debug(e.getMessage());
                 }
             });
         } catch (IOException e) {
