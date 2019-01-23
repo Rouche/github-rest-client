@@ -1,5 +1,8 @@
 package com.utilities.restclient.app.services;
 
+import java.net.HttpURLConnection;
+import java.net.URI;
+
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPatch;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -8,9 +11,6 @@ import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.client.GitHubRequest;
 import org.eclipse.egit.github.core.client.GitHubResponse;
 
-import java.net.HttpURLConnection;
-import java.net.URI;
-
 /**
  * Created by jealar2 on 2018-06-05
  */
@@ -18,7 +18,7 @@ public class GitHubClientAugment extends GitHubClient {
 
     private String credentials;
     private String userAgent = "GitHubJava/2.1.5";
-    private String accept = "application/vnd.github.beta+json";
+    private String accept = "application/vnd.github.v3+json";
     private String acceptNightshade = null;
 
     public void enableNightshade() {

@@ -67,7 +67,7 @@
                                         <td th:text="${repo.repository.private ? 'PRIVATE' : ''}"></td>
                                         <td th:text="${repo.repository.owner.login}"></td>
                                         <td th:text="${repo.repository.cloneUrl}">Url</td>
-                                        <td><a class="fa fa-users" th:href="${'/repositories/' + repo.repository.owner.login + '/' + repo.repository.name + '/collaborators'}"></a></td>
+                                        <td><a class="fa fa-users" title="Collaborators" th:href="${'/repositories/' + repo.repository.owner.login + '/' + repo.repository.name + '/collaborators'}"></a></td>
                                     </tr>
                                 </table>
                             </form>

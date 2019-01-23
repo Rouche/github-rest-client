@@ -1,15 +1,12 @@
 package com.utilities.restclient.app.services;
 
-import com.google.gson.reflect.TypeToken;
-import com.utilities.restclient.app.api.v3.Invitation;
+import java.io.IOException;
+
+import org.eclipse.egit.github.core.Repository;
+import org.eclipse.egit.github.core.client.GitHubResponse;
+import org.eclipse.egit.github.core.service.GitHubService;
 import lombok.Builder;
 import lombok.Data;
-import org.eclipse.egit.github.core.Repository;
-import org.eclipse.egit.github.core.client.*;
-import org.eclipse.egit.github.core.service.GitHubService;
-
-import java.io.IOException;
-import java.util.List;
 
 @Data
 @Builder
